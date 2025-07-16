@@ -162,3 +162,55 @@ source ~/.bashrc
 describe
 ```
 #### DONE. It will list all files and folders in your current working directory.
+
+
+
+# 4. Auto-Uncompress `research` File Script
+
+This script automatically **searches**, **detects**, and **uncompresses** a file named `research` located anywhere in the Linux filesystem — based on its compression type.
+
+---
+
+## What It Does
+
+- Searches the entire filesystem for a file named `research` with any of the following extensions:
+  - `.gz`
+  - `.zip`
+  - `.xz`
+  - `.bz2`
+- Automatically detects the compression type
+- Decompresses it using the appropriate tool
+
+---
+
+## Supported Compression Types
+
+| Extension | Tool       |
+|-----------|------------|
+| `.gz`     | `gunzip`   |
+| `.zip`    | `unzip`    |
+| `.xz`     | `unxz`     |
+| `.bz2`    | `bunzip2`  |
+
+---
+
+## Prerequisites
+
+Make sure the required tools are installed:
+
+```bash
+sudo apt install gzip unzip xz-utils bzip2 -y
+```
+
+## How to Use
+   ### 1. Save the script as find_and_uncompress.sh
+   ### 2. Make it executable:
+   ```bash
+   chmod +x find_and_uncompress.sh
+   ```
+   ### 3. Run the script:
+   ```bash
+   ./find_and_uncompress.sh
+   ```
+   ## If a compressed research file is found, it will be automatically uncompressed in its current directory.
+
