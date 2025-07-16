@@ -214,3 +214,149 @@ sudo apt install gzip unzip xz-utils bzip2 -y
    ```
    ## If a compressed research file is found, it will be automatically uncompressed in its current directory.
 
+# 5. Restrict File Permissions on Creation (Without Using `chmod`)
+
+## Objective
+
+Configure the system so that **any file created by any user** has **no permissions** — meaning the owner (and everyone else) **cannot read, write, or execute** the file.
+
+This is done **without using the `chmod` command**.
+
+---
+
+## How It Works
+
+- This is achieved by setting a **restrictive `umask` value** system-wide.
+
+The `umask` controls the default permissions for newly created files.  
+Setting it to `0777` removes all permissions by default.
+
+---
+
+## Where to Configure `umask 0777`
+
+To apply this setting **system-wide** for all users:
+
+### 1. Edit the `/etc/profile` file:
+
+```bash
+sudo vim /etc/profile
+```
+
+- Scroll to the bottom of the file and add:
+```bash
+umask 0777
+```
+-This ensures that every user gets 0000 permissions when they create a new file.
+
+### 2. Save and exit:
+- If using Nano: Press `Ctrl + O`, `Enter`, then `Ctrl + X`
+
+### 3. Apply the change immediately:
+```bash
+source /etc/profile
+```
+
+## Expected Behavior
+```bash
+touch testfile
+ls -l testfile
+```
+
+```bash
+---------- 1 user user 0 Jul 16 15:40 testfile
+```
+
+# 5. Showtime Service (Cron-Based)
+
+This setup configures a background job that **logs the current system time every minute** to a file named `showtime.log` in the user's home directory. It is implemented using a simple shell script and scheduled via `cron`.
+
+---
+
+## Directory Structure
+
+Assuming your working directory is:
+
+```bash
+~/assignment1/showtime-service
+```
+
+Inside this folder, you will have:
+
+```bash
+showtime.sh        # The script that logs time
+```
+
+---
+
+## Script Content
+
+Create the file `showtime.sh` with the following content:
+
+```bash
+#!/bin/bash
+/usr/bin/date >> /home/$USER/showtime.log
+```
+
+> This appends the current date and time to `~/showtime.log`
+
+---
+
+## Make Script Executable
+
+```bash
+chmod +x ~/assignment1/showtime-service/showtime.sh
+```
+
+---
+
+## Schedule with Cron
+
+Edit your crontab:
+
+```bash
+crontab -e
+```
+
+Add the following line to run the script every minute:
+
+```cron
+* * * * * /home/lenovo/assignment1/showtime-service/showtime.sh
+```
+
+> Replace `lenovo` with your actual username if it's different.
+
+---
+
+## Verify It's Working
+
+1. Wait a minute or two.
+2. Check if the file was created and contains timestamps:
+
+```bash
+cat ~/showtime.log
+```
+
+---
+
+## To Stop Logging
+
+Remove or comment out the cron job:
+
+```bash
+crontab -e
+```
+
+Then delete or comment the line running the script.
+
+---
+
+## Notes
+
+* This approach does **not** require `systemd` service creation.
+* It uses `cron`, which is more portable and sufficient for user-level background tasks.
+* Ensure `cron` service is running: `sudo service cron status`
+
+---
+
+**Done!** You now have a working, minute-based logger using cron.
